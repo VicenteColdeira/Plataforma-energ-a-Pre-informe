@@ -57,7 +57,7 @@ if st.button("Generar Informe"):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", 'B', 12)
-    pdf.image("https://i.imgur.com/H9WgT0z.png", 10, 8, 33)  # Logo referencial
+    pdf.image("logo.png", 10, 8, 33)  # Logo local .png
     pdf.cell(200, 10, txt="Informe de Diagnóstico Energético", ln=1, align='C')
 
     pdf.set_font("Arial", '', 11)
@@ -127,7 +127,6 @@ if st.button("Generar Informe"):
     except Exception as e:
         pdf.multi_cell(0, 10, f"No se pudo calcular el potencial solar: {e}")
 
-    # === Guardar PDF ===
     output_path = "informe_diagnostico.pdf"
     pdf.output(output_path)
 
@@ -136,3 +135,4 @@ if st.button("Generar Informe"):
     href = f'<a href="data:application/pdf;base64,{base64_pdf}" download="Informe_Diagnostico_Energetico.pdf">📥 Descargar Informe PDF</a>'
     st.markdown(href, unsafe_allow_html=True)
     st.success("Informe PDF generado con éxito.")
+
