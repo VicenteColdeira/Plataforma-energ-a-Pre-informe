@@ -9,12 +9,15 @@ import os
 from fpdf import FPDF
 import base64
 
+from openai import OpenAI  # Nueva API 1.0+
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 st.set_page_config(page_title="Diagnóstico Energético Avanzado", layout="centered")
 st.title("🔋 Plataforma de Diagnóstico Energético para Empresas y Viviendas")
 st.write("Completa los datos de tu instalación para recibir un informe con recomendaciones energéticas personalizadas.")
 
 # === 1. Antecedentes de la instalación ===
-st.header("1. Antecedentes de la Instalación")
 col1, col2 = st.columns(2)
 with col1:
     rut = st.text_input("RUT")
@@ -57,7 +60,7 @@ if st.button("Generar Informe"):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", 'B', 12)
-    pdf.image("logo.png", 10, 8, 33)  # Logo local .png
+    pdf.image("logo.png", 10, 8, 33)
     pdf.cell(200, 10, txt="Informe de Diagnóstico Energético", ln=1, align='C')
 
     pdf.set_font("Arial", '', 11)
@@ -93,12 +96,11 @@ if st.button("Generar Informe"):
     pdf.set_font("Arial", 'B', 11)
     pdf.cell(0, 10, txt="Oportunidades de Ahorro (IA)", ln=1)
     try:
-        openai.api_key = os.getenv("OPENAI_API_KEY")
         prompt = f"""
         Analiza los siguientes datos de consumo energético y tipo de instalación, y entrega recomendaciones para ahorrar energía y considerar eficiencia energética (EE):\n
         Tipo: {tipo_instalacion}, Rubro: {rubro}, Región: {region}, Tamaño: {tamanio},\n        Consumo eléctrico mensual: {kwh_mes} kWh, CLP mensual: {clp_mes_elec},\n        Consumo gas mensual: {m3_mes_gas} m³, CLP mensual: {clp_mes_gas},\n        Usos: {', '.join(usos)}.
         """
-        respuesta = openai.ChatCompletion.create(
+        respuesta = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}]
         )
@@ -135,4 +137,3 @@ if st.button("Generar Informe"):
     href = f'<a href="data:application/pdf;base64,{base64_pdf}" download="Informe_Diagnostico_Energetico.pdf">📥 Descargar Informe PDF</a>'
     st.markdown(href, unsafe_allow_html=True)
     st.success("Informe PDF generado con éxito.")
-
